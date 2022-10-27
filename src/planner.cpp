@@ -46,7 +46,7 @@ void Planner::setMap(const nav_msgs::OccupancyGrid::Ptr map) {
   if (Constants::coutDEBUG) {
     std::cout << "I am seeing the map..." << std::endl;
   }
-
+  std::cout << "I am seeing the map..." << std::endl;
   grid = map;
   //update the configuration space with the current map
   configurationSpace.updateGrid(map);
@@ -56,7 +56,6 @@ void Planner::setMap(const nav_msgs::OccupancyGrid::Ptr map) {
   int width = map->info.width;
   bool** binMap;
   binMap = new bool*[width];
-
   for (int x = 0; x < width; x++) { binMap[x] = new bool[height]; }
 
   for (int x = 0; x < width; ++x) {
@@ -65,28 +64,31 @@ void Planner::setMap(const nav_msgs::OccupancyGrid::Ptr map) {
     }
   }
 
-  voronoiDiagram.initializeMap(width, height, binMap);
-  voronoiDiagram.update();
-  voronoiDiagram.visualize();
+  // voronoiDiagram.initializeMap(width, height, binMap);
+  // voronoiDiagram.update();
+  // voronoiDiagram.visualize();
 //  ros::Time t1 = ros::Time::now();
 //  ros::Duration d(t1 - t0);
 //  std::cout << "created Voronoi Diagram in ms: " << d * 1000 << std::endl;
 
   // plan if the switch is not set to manual and a transform is available
-  if (!Constants::manual && listener.canTransform("/map", ros::Time(0), "/base_link", ros::Time(0), "/map", nullptr)) {
+  if (!Constants::manual && listener.canTransform("/map", ros::Time(0), "/odom", ros::Time(0), "/map", nullptr)) {
 
-    listener.lookupTransform("/map", "/base_link", ros::Time(0), transform);
+    // listener.lookupTransform("/map", "/odom", ros::Time(0), transform);
 
     // assign the values to start from base_link
-    start.pose.pose.position.x = transform.getOrigin().x();
-    start.pose.pose.position.y = transform.getOrigin().y();
-    tf::quaternionTFToMsg(transform.getRotation(), start.pose.pose.orientation);
+    // start.pose.pose.position.x = transform.getOrigin().x();
+    // start.pose.pose.position.y = transform.getOrigin().y();
+    // tf::quaternionTFToMsg(transform.getRotation(), start.pose.pose.orientation);
 
-    if (grid->info.height >= start.pose.pose.position.y && start.pose.pose.position.y >= 0 &&
-        grid->info.width >= start.pose.pose.position.x && start.pose.pose.position.x >= 0) {
+    // if (grid->info.height >= start.pose.pose.position.y && start.pose.pose.position.y >= 0 &&
+    //     grid->info.width >= start.pose.pose.position.x && start.pose.pose.position.x >= 0) {
+      
+    if (grid->info.height > 0) {
       // set the start as valid and plan
       validStart = true;
     } else  {
+      cout << "INVALIDATED" << grid->info.height << start.pose.pose.position.y << endl;
       validStart = false;
     }
 
@@ -132,7 +134,7 @@ void Planner::setGoal(const geometry_msgs::PoseStamped::ConstPtr& end) {
   float y = end->pose.position.y / Constants::cellSize;
   float t = tf::getYaw(end->pose.orientation);
 
-  std::cout << "I am seeing a new goal x:" << x << " y:" << y << " t:" << Helper::toDeg(t) << std::endl;
+  // std::cout << "I am seeing a new goal x:" << x << " y:" << y << " t:" << Helper::toDeg(t) << std::endl;
 
   if (grid->info.height >= y && y >= 0 && grid->info.width >= x && x >= 0) {
     validGoal = true;
@@ -204,9 +206,9 @@ void Planner::plan() {
     // CREATE THE UPDATED PATH
     path.updatePath(smoother.getPath());
     // SMOOTH THE PATH
-    smoother.smoothPath(voronoiDiagram);
+    // smoother.smoothPath(voronoiDiagram);
     // CREATE THE UPDATED PATH
-    smoothedPath.updatePath(smoother.getPath());
+    // smoothedPath.updatePath(smoother.getPath());
     ros::Time t1 = ros::Time::now();
     ros::Duration d(t1 - t0);
     std::cout << "TIME in ms: " << d * 1000 << std::endl;
@@ -216,11 +218,11 @@ void Planner::plan() {
     path.publishPath();
     path.publishPathNodes();
     path.publishPathVehicles();
-    smoothedPath.publishPath();
-    smoothedPath.publishPathNodes();
-    smoothedPath.publishPathVehicles();
-    visualization.publishNode3DCosts(nodes3D, width, height, depth);
-    visualization.publishNode2DCosts(nodes2D, width, height);
+    // smoothedPath.publishPath();
+    // smoothedPath.publishPathNodes();
+    // smoothedPath.publishPathVehicles();
+    // visualization.publishNode3DCosts(nodes3D, width, height, depth);
+    // visualization.publishNode2DCosts(nodes2D, width, height);
 
 
 
