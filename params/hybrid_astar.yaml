@@ -1,0 +1,76 @@
+---
+# CONFIG FLAGS
+cfg_flgs:
+   # A flag for additional debugging output via `std::cout`
+   coutDEBUG: false
+   # A flag for the mode (true = manual; false = dynamic). Manual for static map or dynamic for dynamic map.
+   manual: false
+   # A flag for the visualization of 3D nodes (true = on; false = off)
+   visualization: false  # (&& manual in code)
+   # A flag for the visualization of 2D nodes (true = on; false = off)
+   visualization2D: false  # (&& manual in code)
+   # A flag to toggle reversing (true = on; false = off)
+   reverse: false
+   # A flag to toggle the connection of the path via Dubin's shot (true = on; false = off)
+   dubinsShot: false
+   # A flag to toggle the Dubin's heuristic, this should be false, if reversing is enabled (true = on; false = off)
+   dubins: false
+
+   #  var dubinsLookup
+   #  brief A flag to toggle the Dubin's heuristic via lookup, potentially speeding up the search by a lot
+   #  todo not yet functional
+   dubinsLookup: false  # (&& dubins in code)
+   # A flag to toggle the 2D heuristic (true = on; false = off)
+   twoD: true
+
+# GENERAL CONSTANTS
+general_consts:
+   # [#] --- Limits the maximum search depth of the algorithm, possibly terminating without the solution
+   iterations: 20000
+   # [m] --- Uniformly adds a padding around the vehicle
+   bloating: 0.1
+   # [m] --- The width of the vehicle
+   width: 0.66  # + 2 * bloating (in code)
+   # [m] --- The length of the vehicle
+   length: 0.8  # + 2 * bloating (in code)
+   # [m] --- The minimum turning radius of the vehicle
+   r: 1
+   # [m] --- The number of discretizations in heading
+   headings: 72
+   # [m] --- The cell size of the 2D grid of the world
+   cellSize: 0.1
+
+   #  \brief [m] --- The tie breaker breaks ties between nodes expanded in the same cell
+
+   #  As the cost-so-far are bigger than the cost-to-come it is reasonbale to believe that the algorithm would prefer the predecessor rather than the successor.
+   #  This would lead to the fact that the successor would never be placed and the the one cell could only expand one node. The tieBreaker artificially increases the cost of the predecessor
+   #  to allow the successor being placed in the same cell.
+   tieBreaker: 0.001
+
+# HEURISTIC CONSTANTS
+heuristic_consts:
+   # [#] --- A movement cost penalty for turning (choosing non straight motion primitives)
+   penaltyTurning: 1.05
+   # [#] --- A movement cost penalty for reversing (choosing motion primitives > 2)
+   penaltyReversing: 2.0
+   # [#] --- A movement cost penalty for change of direction (changing from primitives < 3 to primitives > 2)
+   penaltyCOD: 2.5
+   # [m] --- The distance to the goal when the analytical solution (Dubin's shot) first triggers
+   dubinsShotDistance: 100
+   # [m] --- The step size for the analytical solution (Dubin's shot) primarily relevant for collision checking
+   dubinsStepSize: 1
+
+# DUBINS LOOKUP SPECIFIC
+dubinslookup_consts:
+   # [m] --- The width of the dubinsArea / 2 for the analytical solution (Dubin's shot)
+   dubinsWidth: 15
+
+# COLLISION LOOKUP SPECIFIC
+collisionlookup_consts:
+   # [#] --- The sqrt of the number of discrete positions per cell
+   positionResolution: 10
+
+# SMOOTHER SPECIFIC
+smoother_consts:
+   # [m] --- The minimum width of a safe road for the vehicle at hand
+   minRoadWidth: 1.2
